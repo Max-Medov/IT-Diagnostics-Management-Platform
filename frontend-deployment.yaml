@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend
+  namespace: it-diagnostics
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: frontend
+  template:
+    metadata:
+      labels:
+        app: frontend
+    spec:
+      containers:
+      - name: frontend
+        image: it_diagnostic_project_frontend:latest
+        imagePullPolicy: Never
+        ports:
+        - containerPort: 3000
+        env:
+        - name: REACT_APP_AUTH_SERVICE_URL
+          value: "http://auth.local"
+        - name: REACT_APP_CASE_SERVICE_URL
+          value: "http://case.local"
+        - name: REACT_APP_DIAGNOSTIC_SERVICE_URL
+          value: "http://diagnostic.local"
+

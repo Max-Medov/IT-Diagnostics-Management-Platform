@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: it-diagnostics-config
+  namespace: it-diagnostics
+data:
+  POSTGRES_DB: "itdiagnostics"

@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: case-service
+  namespace: it-diagnostics
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: case-service
+  template:
+    metadata:
+      labels:
+        app: case-service
+    spec:
+      containers:
+      - name: case-service
+        image: it_diagnostic_project_case_service:latest
+        imagePullPolicy: Never
+        ports:
+        - containerPort: 5001
+        env:
+        - name: DATABASE_URI
+          value: "postgresql://postgres:yourpassword@postgres:5432/itdiagnostics"
+        - name: SECRET_KEY
+          value: "your_secret_key"
