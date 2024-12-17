@@ -15,8 +15,8 @@ spec:
     spec:
       containers:
       - name: frontend
-        image: it_diagnostic_project_frontend:latest
-        imagePullPolicy: Never
+        image: maxmedov/it-diagnostics-management-platform:frontend
+        imagePullPolicy: Always
         ports:
         - containerPort: 3000
         env:
@@ -26,4 +26,19 @@ spec:
           value: "http://case.local"
         - name: REACT_APP_DIAGNOSTIC_SERVICE_URL
           value: "http://diagnostic.local"
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend
+  namespace: it-diagnostics
+spec:
+  type: NodePort
+  ports:
+  - port: 80
+    targetPort: 3000
+    nodePort: 30004
+  selector:
+    app: frontend
 

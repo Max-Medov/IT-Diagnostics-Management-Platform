@@ -15,8 +15,8 @@ spec:
     spec:
       containers:
       - name: case-service
-        image: it_diagnostic_project_case_service:latest
-        imagePullPolicy: Never
+        image: maxmedov/it-diagnostics-management-platform:case_service
+        imagePullPolicy: Always
         ports:
         - containerPort: 5001
         env:
@@ -24,3 +24,18 @@ spec:
           value: "postgresql://postgres:yourpassword@postgres:5432/itdiagnostics"
         - name: SECRET_KEY
           value: "your_secret_key"
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: case-service
+  namespace: it-diagnostics
+spec:
+  type: ClusterIP
+  ports:
+  - port: 5001
+    targetPort: 5001
+  selector:
+    app: case-service
+

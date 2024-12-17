@@ -15,8 +15,8 @@ spec:
     spec:
       containers:
       - name: auth-service
-        image: it_diagnostic_project_auth_service:latest
-        imagePullPolicy: Never
+        image: maxmedov/it-diagnostics-management-platform:auth_service
+        imagePullPolicy: Always
         ports:
         - containerPort: 5000
         env:
@@ -25,3 +25,18 @@ spec:
         - name: SECRET_KEY
           value: "your_secret_key"
         command: ["flask", "run", "--host=0.0.0.0", "--port=5000", "--debug"]
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: auth-service
+  namespace: it-diagnostics
+spec:
+  type: ClusterIP
+  ports:
+  - port: 5000
+    targetPort: 5000
+  selector:
+    app: auth-service
+
