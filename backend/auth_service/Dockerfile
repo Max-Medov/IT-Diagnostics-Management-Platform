@@ -10,6 +10,8 @@ COPY common /app/common
 
 COPY auth_service /app
 
+EXPOSE 5000
+
 CMD ["python", "app.py"]
 
 

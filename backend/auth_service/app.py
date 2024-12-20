@@ -6,6 +6,7 @@ from flask_jwt_extended import JWTManager, create_access_token, jwt_required, ge
 from flask_cors import CORS
 from tenacity import retry, stop_after_attempt, wait_fixed
 from werkzeug.security import generate_password_hash, check_password_hash
+from prometheus_flask_exporter import PrometheusMetrics
 import os
 import logging
 
@@ -20,6 +21,9 @@ CORS(app, resources={r"/*": {"origins": ["http://frontend.local"], "supports_cre
 db.init_app(app)
 jwt = JWTManager(app)
 migrate = Migrate(app, db)
+
+metrics = PrometheusMetrics(app)
+metrics.info('app_info', 'Application info', version='1.0.3')
 
 
 @retry(stop=stop_after_attempt(5), wait=wait_fixed(5))
