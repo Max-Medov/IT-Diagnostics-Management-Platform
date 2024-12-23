@@ -8,7 +8,7 @@ from flask_migrate import Migrate
 from flask_jwt_extended import JWTManager, jwt_required, get_jwt_identity, create_access_token, get_jwt
 from flask_cors import CORS
 from tenacity import retry, stop_after_attempt, wait_fixed
-
+from prometheus_flask_exporter import PrometheusMetrics
 from common.models import db, Case, User
 from common.config import Config
 from scripts.generate_diagnostic_script import generate_diagnostic_script
@@ -25,6 +25,9 @@ CORS(app, resources={r"/*": {"origins": "*"}})
 db.init_app(app)
 jwt = JWTManager(app)
 migrate = Migrate(app, db)
+
+metrics = PrometheusMetrics(app)
+metrics.info('app_info', 'Application info', version='1.0.3')
 
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 
@@ -262,6 +265,10 @@ def download_script(case_id):
     except Exception as e:
         app.logger.error(f"Exception in /download_script/{case_id}: {str(e)}")
         return jsonify({'message': 'Internal server error'}), 500
+        
+@app.route('/metrics')
+def metrics():
+    return metrics.generate_latest(), 200        
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5002)

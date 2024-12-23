@@ -4,6 +4,7 @@ from common.models import db, Case, User, CaseComment
 from common.config import Config
 from flask_jwt_extended import JWTManager, jwt_required, get_jwt_identity, get_jwt
 from flask_cors import CORS
+from prometheus_flask_exporter import PrometheusMetrics
 from tenacity import retry, stop_after_attempt, wait_fixed
 import os
 import logging
@@ -18,6 +19,9 @@ CORS(app, resources={r"/*": {"origins": ["http://case.local"]}}, supports_creden
 db.init_app(app)
 jwt = JWTManager(app)
 migrate = Migrate(app, db)
+
+metrics = PrometheusMetrics(app)
+metrics.info('app_info', 'Application info', version='1.0.3')
 
 @retry(stop=stop_after_attempt(5), wait=wait_fixed(5))
 def initialize_database():
@@ -111,7 +115,6 @@ def admin_all_cases():
         app.logger.error(f"Exception in /admin/cases GET: {e}")
         return jsonify({'message': 'Internal server error'}), 500
 
-# New endpoints for comments
 @app.route('/cases/<int:case_id>/comments', methods=['GET', 'POST'])
 @jwt_required()
 def case_comments(case_id):
@@ -148,6 +151,10 @@ def case_comments(case_id):
     except Exception as e:
         app.logger.error(f"Exception in /cases/{case_id}/comments: {e}")
         return jsonify({'message': 'Internal server error'}), 500
+        
+@app.route('/metrics')
+def metrics():
+    return metrics.generate_latest(), 200
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5001)
